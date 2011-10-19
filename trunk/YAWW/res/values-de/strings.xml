@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="lLocation">Geben Sie den gewünschten Ort hier ein:</string>
+    <string name="bSave">Speichern</string>
+    <string name="noMatch">Fehler bei der Übertragung</string>
+    <string name="errorCity">Fehler! Die eingegebene Stadt wurde nicht gefunden.</string>
+    <string name="lastUpdate">Letztes Update:</string>
+</resources>

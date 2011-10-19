@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="lLocation">Enter your location here</string>
+    <string name="app_name">YAWW</string>
+    <string name="bSave">Save</string>
+    <string name="credit">Credit</string>
+    <string name="noMatch">Error during transfer.</string>
+    <string name="errorCity">Error! Your city was not found.</string>
+    <string name="lastUpdate">Last update:</string>
+</resources>
