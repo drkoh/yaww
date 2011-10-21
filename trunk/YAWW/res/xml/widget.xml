@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 3 cells := (3 * 74) - 2-->
+<appwidget-provider
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:minWidth="294dip"  
+    android:minHeight="72dip"
+    android:initialLayout="@layout/widget_layout"
+    android:updatePeriodMillis="14400000"
+    android:configure="de.garbereder.YAWWActivity"
+/>
+<!-- 
+    android:updatePeriodMillis="14400000" -->
