@@ -14,11 +14,14 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.xml.sax.SAXException;
 
+import de.garbereder.ColorPicker.ColorPickerDialog;
+
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.BitmapDrawable;
@@ -63,15 +66,18 @@ public class YAWWActivity extends Activity {
         ((Button)this.findViewById(R.id.bColor)).setOnClickListener(new OnClickListener() {
 			//@Override
         	public void onClick(View v) {
-        		new ColorPickerDialog(
+        		ColorPickerDialog cpv = new ColorPickerDialog(
         			activity,
-        			new ColorPickerDialog.OnColorChangedListener() {
-        				public void colorChanged(int color) {
-        					((TextView)activity.findViewById(R.id.tColor)).setText(ColorPickerDialog.toHex(color));
-        				}
-        			},
         			new BigInteger(((TextView)activity.findViewById(R.id.tColor)).getText().toString().substring(2), 16).intValue()
-    			).show();
+    			);
+    			cpv.setOnDismissListener( new DialogInterface.OnDismissListener() {
+					
+					public void onDismiss(DialogInterface dialog) {
+						ColorPickerDialog cpv = (ColorPickerDialog)dialog;
+    					((TextView)activity.findViewById(R.id.tColor)).setText(ColorPickerDialog.toHex(cpv.getColor()));
+					}
+				});
+        		cpv.show();
         	}
         });        
 
