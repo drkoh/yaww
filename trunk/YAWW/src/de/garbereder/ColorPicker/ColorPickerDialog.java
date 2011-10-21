@@ -1,12 +1,25 @@
-package de.garbereder;
+package de.garbereder.ColorPicker;
+
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
 
 import android.os.Bundle;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
-import android.graphics.*;
+import android.content.DialogInterface;
+import android.graphics.Canvas;
+import android.graphics.LinearGradient;
+import android.graphics.Paint;
+import android.graphics.Shader;
 import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup.LayoutParams;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 
 public class ColorPickerDialog extends Dialog {
 
@@ -14,8 +27,10 @@ public class ColorPickerDialog extends Dialog {
         void colorChanged(int color);
     }
 
-    private OnColorChangedListener mListener;
+    private Context ctx;
     private int mInitialColor;
+    private Button mColorButton;
+	private ColorPickerView mCpv;
 
     private static class ColorPickerView extends View {
         private Paint mRainbowPaint;
@@ -33,11 +48,12 @@ public class ColorPickerDialog extends Dialog {
         private final int[] mColors;
         private final int[] mAlphaColors;
         
-        private OnColorChangedListener mListener;
+        private List<OnColorChangedListener> mListener;
         
-        ColorPickerView(Context c, OnColorChangedListener l, int color) {
+        ColorPickerView(Context c, int color) {
             super(c);
-            mListener = l;
+            
+            mListener = new ArrayList<ColorPickerDialog.OnColorChangedListener>();
             
             mColors = new int[] {
             		0xFF000000,
@@ -55,9 +71,11 @@ public class ColorPickerDialog extends Dialog {
             };
             
             mMargin = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 15, getResources().getDisplayMetrics());
-            mRainbowWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 40, getResources().getDisplayMetrics());
+            mRainbowWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 20, getResources().getDisplayMetrics());
             mRainbowHeight = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 160, getResources().getDisplayMetrics());
-
+            
+            setLayoutParams(new LayoutParams(-1,(int)(mRainbowHeight+mMargin)));
+            
             Shader gradient = new LinearGradient(0,0,0,mRainbowHeight,mColors,null,Shader.TileMode.MIRROR);
             
             mRainbowPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -82,7 +100,7 @@ public class ColorPickerDialog extends Dialog {
         	canvas.drawRect(mMargin, 0, mRainbowWidth + mMargin, mRainbowHeight, mRainbowPaint);
         	canvas.drawRect(mMargin*2+mRainbowWidth, 0, mRainbowWidth + mMargin*2+mRainbowWidth, mRainbowHeight, mAlphaPaint);
         	
-        	canvas.drawRect(mMargin*3+mRainbowWidth*2,0,getWidth() - mMargin,getWidth()- mMargin -(mMargin*3+mRainbowWidth*2), mChoosenPaint);
+        	canvas.drawRect(mMargin*3+mRainbowWidth*2,0,getWidth() - mMargin,mRainbowHeight, mChoosenPaint);
         	
         	canvas.drawRect(mMargin-5, mRainbowNormalPos*mRainbowHeight-5, mMargin+mRainbowWidth+5, mRainbowNormalPos*mRainbowHeight+5, paint);
         	canvas.drawRect(mMargin*2+mRainbowWidth-5, mAlphaNormalPos*mRainbowHeight-5, mMargin*2+mRainbowWidth+mRainbowWidth+5, mAlphaNormalPos*mRainbowHeight+5, paint);
@@ -102,13 +120,12 @@ public class ColorPickerDialog extends Dialog {
         				// y position zwischen 0 und 1
         				mRainbowNormalPos = normalizePosition(event.getY(), mRainbowHeight);
         				int color = interpolateColor(mColors, mRainbowNormalPos);
-        				mColor = (color & 0x00FFFFFF) + (mColor & 0xFF000000);
+        				setColor(color & 0x00FFFFFF + (mColor & 0xFF000000));
         				mChoosenPaint.setColor(mColor);
         				mAlphaColors[0] = mColor | 0xFF000000; // set alpha to 1
         				mAlphaColors[1] = mAlphaColors[0] & 0x00FFFFFF; // set alpha to 0
         	            Shader alphaGradient = new LinearGradient(0,0,0,mRainbowHeight,mAlphaColors,null,Shader.TileMode.MIRROR);
         	            mAlphaPaint.setShader(alphaGradient);
-            			mListener.colorChanged(mColor);
         				invalidate();
         			}
         			// ALPHA
@@ -117,14 +134,24 @@ public class ColorPickerDialog extends Dialog {
         					event.getY() < mRainbowHeight*1.01 )
         			{
         				mAlphaNormalPos = normalizePosition(event.getY(), mRainbowHeight);
-        				mColor = interpolateColor(mAlphaColors, mAlphaNormalPos);
+        				setColor(interpolateColor(mAlphaColors, mAlphaNormalPos));
         				mChoosenPaint.setColor(mColor);
-            			mListener.colorChanged(mColor);
         				invalidate();
         			}
         		break;
         	}
         	return true;
+        }
+        
+        private void invokeOnColorChanged(int color)
+        {
+        	for( OnColorChangedListener l : mListener )
+        		l.colorChanged(color);
+        }
+        
+        public void addOnColorChangedListener( OnColorChangedListener l )
+        {
+        	mListener.add(l);
         }
         
         private float normalizePosition( float pos, float height )
@@ -211,28 +238,82 @@ public class ColorPickerDialog extends Dialog {
         	}
         	return i;
         }
+        
+        public void setColor(int color)
+        {
+        	mColor = color;
+        	invokeOnColorChanged(color);
+        }
     }
 
     public ColorPickerDialog(Context context,
-                             OnColorChangedListener listener,
                              int initialColor) {
         super(context);
-
-        mListener = listener;
         mInitialColor = initialColor;
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        OnColorChangedListener l = new OnColorChangedListener() {
-            public void colorChanged(int color) {
-                mListener.colorChanged(color);
-                //dismiss();
-            }
-        };
+        setCancelable(true);
+        
+        ctx = getContext();
+        LinearLayout layout = new LinearLayout(ctx);
+        
+        mCpv = new ColorPickerView(ctx, mInitialColor);
+        mColorButton = new Button(ctx);
+        mColorButton.setText(toHex(mInitialColor));
+        mColorButton.setOnClickListener( new View.OnClickListener() {
+			
+			public void onClick(View v) {
+				AlertDialog.Builder alert = new AlertDialog.Builder(ctx);
 
-        setContentView(new ColorPickerView(getContext(), l, mInitialColor));
+				alert.setTitle("Color");
+				alert.setMessage("Choose color");
+
+				// Set an EditText view to get user input 
+				final EditText input = new EditText(ctx);
+				input.setText(mColorButton.getText());
+				alert.setView(input);
+
+				alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+				  mCpv.setColor(new BigInteger(input.getText().toString().substring(2), 16).intValue());
+				  }
+				});
+
+				alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+				  public void onClick(DialogInterface dialog, int whichButton) {
+				    // Canceled.
+				  }
+				});
+
+				alert.show();
+			}
+		});
+
+        mCpv.addOnColorChangedListener(new OnColorChangedListener() {
+			public void colorChanged(int color) {
+				mColorButton.setText(toHex(color));
+			}
+		});
+        layout.setLayoutParams(new LayoutParams(-1,-1));
+        layout.setOrientation(LinearLayout.VERTICAL);
+        layout.addView(mCpv);
+
+        int[] colors = new int[] {
+            0xFFFF0000, 0xFFFF00FF, 0xFF0000FF, 0xFF00FFFF, 0xFF00FF00,
+            0xFFFFFF00, 0xFFFF0000
+        };
+        ColorLine cl = new ColorLine(ctx, colors);
+        cl.setMargin(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 15, ctx.getResources().getDisplayMetrics()));
+        cl.setLayoutParams(new LayoutParams(20,-1));
+        ColorRect cr = new ColorRect(ctx, mCpv.mColor);
+        cr.setLayoutParams(new LayoutParams(255,-1));
+        //layout.addView(cl);
+        layout.addView(cr);
+        layout.addView(mColorButton);
+        setContentView(layout);
         setTitle("Pick a Color");
     }
     
@@ -243,6 +324,10 @@ public class ColorPickerDialog extends Dialog {
     	{
     		s = "0" + s;
     	}
-    	return "0x"+s;
+    	return "0x"+s.toUpperCase();
     }
+
+	public int getColor() {
+		return mCpv.mColor;
+	}
 }
