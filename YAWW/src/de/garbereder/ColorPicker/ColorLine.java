@@ -1,5 +1,9 @@
 package de.garbereder.ColorPicker;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import de.garbereder.ColorPicker.ColorPickerDialog.OnColorChangedListener;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.LinearGradient;
@@ -13,21 +17,25 @@ public class ColorLine extends View {
 	private Paint mPaint;
 	private final int[] mColors;
 	private int mColor;
-	private float mMargin = 5;
+	private float mMargin = 2;
+    private List<OnColorChangedListener> mListener;
 	
 	public ColorLine(Context context, int[] colors) {
 		super(context);
-		mColors = colors;
+		mColors = (int[])(colors.clone());
+        mListener = new ArrayList<ColorPickerDialog.OnColorChangedListener>();
 		
 		Shader gradient = new LinearGradient(0,0,0,getHeight(),mColors,null,Shader.TileMode.MIRROR);
         mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mPaint.setShader(gradient);
-        mPaint.setStrokeWidth(1);
-        
-        mColor = 0xFFFF0000;
-        
+        mPaint.setStrokeWidth(5);        
 	}
-
+	
+    public void addOnColorChangedListener( OnColorChangedListener l )
+    {
+    	mListener.add(l);
+    }
+    
     @Override 
     protected void onDraw(Canvas canvas) {
     	Paint paint = new Paint();
@@ -56,8 +64,12 @@ public class ColorLine extends View {
     	pts[14] = 0;
     	pts[15] = pos*getHeight()-2.5f;
     	
+		Shader gradient = new LinearGradient(0,0,0,getHeight(),mColors,null,Shader.TileMode.MIRROR);
+        mPaint.setShader(gradient);
     	canvas.drawRect(mMargin, 0, getWidth()-mMargin, getHeight(), mPaint);    	
     	canvas.drawLines(pts, paint);
+    	
+    	System.out.println("DRAWING");
     }
     
     @Override
@@ -66,6 +78,12 @@ public class ColorLine extends View {
     	super.onLayout(changed, left, top, right, bottom);
 		Shader gradient = new LinearGradient(0,0,0,getHeight(),mColors,null,Shader.TileMode.MIRROR);
         mPaint.setShader(gradient);
+    }
+    
+    private void invokeOnColorChanged(int color)
+    {
+    	for( OnColorChangedListener l : mListener )
+    		l.colorChanged(color);
     }
     
     private float colorToNormalizedPosition( int color )
@@ -121,9 +139,10 @@ public class ColorLine extends View {
     	return true;
     }
 
-    private void setColor(int color) {
-    	System.out.println(ColorPickerDialog.toHex(mColor));
+    public void setColor(int color) {
 		mColor = color;
+		invokeOnColorChanged(color);
+		invalidate();
 	}
 
 	private float normalizePosition( float pos, float height )
