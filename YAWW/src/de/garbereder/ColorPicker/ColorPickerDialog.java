@@ -33,6 +33,7 @@ public class ColorPickerDialog extends Dialog {
 	private ColorPickerView mCpv;
 	private ColorRect cr;
 	private ColorLine cl;
+	private ColorLine al;
 
     private static class ColorPickerView extends View {
         private Paint mRainbowPaint;
@@ -180,8 +181,8 @@ public class ColorPickerDialog extends Dialog {
 			// (normPos - normIdx) / (1/length)
 			// d.h. differenz relativ zur größe
 			float fromRelative = (float) (normalizedPosition - fromIdx/(length-1.0))*(length-1);
-			System.out.println(fromIdx);
-			System.out.println(fromRelative);
+			//System.out.println(fromIdx);
+			//System.out.println(fromRelative);
 			if( fromRelative > 1 ){
 				fromRelative -= 1;
 				fromIdx += 1;
@@ -301,12 +302,14 @@ public class ColorPickerDialog extends Dialog {
 		});
         layout.setLayoutParams(new LayoutParams(-1,-1));
         layout.setOrientation(LinearLayout.HORIZONTAL);
-        //layout.addView(mCpv);
 
         int[] colors = new int[] {
             0xFFFF0000, 0xFFFF00FF, 0xFF0000FF, 0xFF00FFFF, 0xFF00FF00,
             0xFFFFFF00, 0xFFFF0000
         };
+        int[] aColors = new int[] {
+                0x00FF0000, 0xFFFF0000
+            };
         cl = new ColorLine(ctx, colors);
         cl.setColor(0xFFFF0000);
         cl.setMargin(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 2, ctx.getResources().getDisplayMetrics()));
@@ -315,17 +318,46 @@ public class ColorPickerDialog extends Dialog {
 			
 			@Override
 			public void colorChanged(int color) {
-				cr.setColor(color);
+				cr.setVertexColor(color);
+				al.setColors(new int[]{color&0x00FFFFFF,color});
+				al.setColor((color & 0x00FFFFFF) | (al.getColor() & 0xFF000000)); // keep alpha channel
+				updateColorButton();
+			}
+			
+		});
+        al = new ColorLine(ctx, aColors);
+        al.setColor(0xFFFF0000);
+        al.setMargin(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 2, ctx.getResources().getDisplayMetrics()));
+        al.setLayoutParams(new LayoutParams(25,-1));
+        al.addOnColorChangedListener(new OnColorChangedListener() {
+			
+			@Override
+			public void colorChanged(int color) {
+				updateColorButton();
 			}
 			
 		});
         cr = new ColorRect(ctx, 0xFFFF0000);
-        cr.setLayoutParams(new LayoutParams(255,255));
+        cr.setLayoutParams(new LayoutParams(300,300));
+        cr.addOnColorChangedListener(new OnColorChangedListener() {
+			
+			@Override
+			public void colorChanged(int color) {
+				updateColorButton();
+			}
+			
+		});
         layout.addView(cl);
+        layout.addView(al);
         layout.addView(cr);
-        //layout.addView(mColorButton);
+        layout.addView(mColorButton);
         setContentView(layout);
         setTitle("Pick a Color");
+    }
+    
+    private void updateColorButton()
+    {
+		mColorButton.setText(ColorPickerDialog.toHex((cr.getColor() & 0x00FFFFFF) | (al.getColor() & 0xFF000000)));
     }
     
 	public final static String toHex( int i )

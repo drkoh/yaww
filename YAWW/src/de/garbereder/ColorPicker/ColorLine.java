@@ -15,20 +15,21 @@ import android.view.View;
 public class ColorLine extends View {
 
 	private Paint mPaint;
-	private final int[] mColors;
+	private int[] mColors;
 	private int mColor;
 	private float mMargin = 2;
+	private float cursorPos;
     private List<OnColorChangedListener> mListener;
 	
 	public ColorLine(Context context, int[] colors) {
 		super(context);
-		mColors = (int[])(colors.clone());
-        mListener = new ArrayList<ColorPickerDialog.OnColorChangedListener>();
+		//mColors = (int[])(colors.clone());
 		
-		Shader gradient = new LinearGradient(0,0,0,getHeight(),mColors,null,Shader.TileMode.MIRROR);
         mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mPaint.setShader(gradient);
         mPaint.setStrokeWidth(5);        
+        
+		setColors(colors);
+        mListener = new ArrayList<ColorPickerDialog.OnColorChangedListener>();
 	}
 	
     public void addOnColorChangedListener( OnColorChangedListener l )
@@ -38,12 +39,18 @@ public class ColorLine extends View {
     
     @Override 
     protected void onDraw(Canvas canvas) {
+    	
+    	//! @todo optimierung, dass nicht immer alles gerechnet werden muss
+    	
     	Paint paint = new Paint();
         paint.setColor(0xFF000000);
     	paint.setStrokeWidth(2);
     	
     	float[] pts = new float[16]; // 4 points
+    	/*
     	float pos = colorToNormalizedPosition(mColor);
+		*/
+    	float pos = cursorPos;
     	pts[0] = 0;
     	pts[1] = pos*getHeight()-2.5f;
     	pts[2] = getWidth();
@@ -68,8 +75,6 @@ public class ColorLine extends View {
         mPaint.setShader(gradient);
     	canvas.drawRect(mMargin, 0, getWidth()-mMargin, getHeight(), mPaint);    	
     	canvas.drawLines(pts, paint);
-    	
-    	System.out.println("DRAWING");
     }
     
     @Override
@@ -104,6 +109,7 @@ public class ColorLine extends View {
     			break;
     		}
     	}
+
     	if( changeingBits == 0xFF000000 )
     	{
     		return normalizePos( i, color, changeingBits, 24, up );
@@ -130,9 +136,11 @@ public class ColorLine extends View {
 			case MotionEvent.ACTION_UP:
     		case MotionEvent.ACTION_MOVE:
 				// y position zwischen 0 und 1
-				float normaPos = normalizePosition(event.getY(), getHeight());
-				int color = interpolateColor(mColors, normaPos);
-				setColor(color & 0x00FFFFFF + (mColor & 0xFF000000));
+				cursorPos = normalizePosition(event.getY(), getHeight());
+				int color = interpolateColor(mColors, cursorPos);
+				//setColor(color & 0x00FFFFFF + (mColor & 0xFF000000));
+				setColor(color);
+				//System.out.println(ColorPickerDialog.toHex(color));
 				invalidate();
     		break;
     	}
@@ -141,6 +149,7 @@ public class ColorLine extends View {
 
     public void setColor(int color) {
 		mColor = color;
+		cursorPos = colorToNormalizedPosition(color);
 		invokeOnColorChanged(color);
 		invalidate();
 	}
@@ -154,6 +163,7 @@ public class ColorLine extends View {
 			normalPos = pos / height;
 		else if ( pos > height )
 			normalPos = 1;
+		//System.out.println("norm: " + normalPos + " " + pos + " " + height);
 		return normalPos;
     }
     
@@ -169,8 +179,6 @@ public class ColorLine extends View {
 		// (normPos - normIdx) / (1/length)
 		// d.h. differenz relativ zur größe
 		float fromRelative = (float) (normalizedPosition - fromIdx/(length-1.0))*(length-1);
-		System.out.println(fromIdx);
-		System.out.println(fromRelative);
 		if( fromRelative > 1 ){
 			fromRelative -= 1;
 			fromIdx += 1;
@@ -214,6 +222,7 @@ public class ColorLine extends View {
 		{
 			offset = offset << 24;
 		}
+		//System.out.println("offset: " + ColorPickerDialog.toHex(offset));
 		return offset + color;
     }
     
@@ -232,8 +241,9 @@ public class ColorLine extends View {
     
     private float normalizePos( int idx, int color, int changeingBits, int offset, boolean up )
     {
-		int x = changeingBits >> offset;
-		int y = (color & changeingBits) >> offset;
+		int x = changeingBits >>> offset;
+		int y = (color & changeingBits) >>> offset;
+			//System.out.println(ColorPickerDialog.toHex(y) + "/" + ColorPickerDialog.toHex(x) + " " + ColorPickerDialog.toHex(changeingBits) + " " + offset);
 		if( up )
 			return 1.0f/(mColors.length-1)*idx + 1.0f/(mColors.length-1)*(((float)y/x));
 		else
@@ -247,6 +257,17 @@ public class ColorLine extends View {
 
 	public float getMargin() {
 		return mMargin;
+	}
+
+	public void setColors(int[] colors) {
+		mColors = colors;
+		Shader gradient = new LinearGradient(0,0,0,getHeight(),mColors,null,Shader.TileMode.MIRROR);
+        mPaint.setShader(gradient);
+        invalidate();
+	}
+
+	public int getColor() {
+		return mColor;
 	}
 
 }
