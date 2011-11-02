@@ -1,20 +1,14 @@
 package de.garbereder.ColorPicker;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.os.Bundle;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.graphics.Canvas;
-import android.graphics.LinearGradient;
-import android.graphics.Paint;
-import android.graphics.Shader;
+import android.os.Bundle;
 import android.util.TypedValue;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
