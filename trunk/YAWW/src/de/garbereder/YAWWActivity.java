@@ -65,10 +65,18 @@ public class YAWWActivity extends Activity {
         ((Button)this.findViewById(R.id.bColor)).setOnClickListener(new OnClickListener() {
 			//@Override
         	public void onClick(View v) {
-        		new ColorPickerDialog(
+        		ColorPickerDialog cpd = new ColorPickerDialog(
         			activity,
         			new BigInteger(((TextView)activity.findViewById(R.id.tColor)).getText().toString().substring(2), 16).intValue()
-    			).show();
+    			);
+        		cpd.addOnColorChangedListener(new ColorPickerDialog.OnColorChangedListener() {
+					
+					@Override
+					public void colorChanged(int color) {
+						((TextView)activity.findViewById(R.id.tColor)).setText(ColorPickerDialog.toHex(color));
+					}
+				});
+        		cpd.show();
         	}
         });        
 
