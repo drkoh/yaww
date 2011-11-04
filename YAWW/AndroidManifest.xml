@@ -7,7 +7,7 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application android:icon="@drawable/colorfull_sunny" android:label="@string/app_name">
-        <activity android:name=".YAWWActivity"
+        <activity android:name=".YAWWPrefActivity"
                   android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />

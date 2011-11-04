@@ -29,12 +29,14 @@ public class ColorPickerDialog extends Dialog {
 	private ColorLine cl;
 	private ColorLine al;
     private List<OnColorChangedListener> mListener;
+    public ColorPickerDialog cpd;
 
     public ColorPickerDialog(Context context,
                              int initialColor) {
         super(context);
         mInitialColor = initialColor;
         mListener = new ArrayList<ColorPickerDialog.OnColorChangedListener>();
+        cpd = this;
     }
 
     @Override
@@ -43,14 +45,18 @@ public class ColorPickerDialog extends Dialog {
         setCancelable(true);
         
         ctx = getContext();
-        LinearLayout horizontalLayout = new LinearLayout(ctx);
         LinearLayout verticalLayout = new LinearLayout(ctx);
+        LinearLayout horizontalLayout = new LinearLayout(ctx);
+        LinearLayout horizontalLayout2 = new LinearLayout(ctx);
         
         verticalLayout.setOrientation(LinearLayout.VERTICAL);
         verticalLayout.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,LayoutParams.MATCH_PARENT));
 
         horizontalLayout.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,LayoutParams.WRAP_CONTENT));
         horizontalLayout.setOrientation(LinearLayout.HORIZONTAL);
+        
+        horizontalLayout2.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,LayoutParams.WRAP_CONTENT));
+        horizontalLayout2.setOrientation(LinearLayout.HORIZONTAL);
 
         mColorButton = new Button(ctx);
         mColorButton.setText(toHex(mInitialColor));
@@ -69,9 +75,9 @@ public class ColorPickerDialog extends Dialog {
 
 				alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int whichButton) {
-				  //cl.setColor(new BigInteger(input.getText().toString().substring(2), 16).intValue());
-				//! @todo fixme
-					System.out.println("not implemented");
+					mColorButton.setText(input.getText());
+					//! @todo fixme
+					//cl.setColor(new BigInteger(input.getText().toString().substring(2), 16).intValue());
 				  }
 				});
 
@@ -88,10 +94,11 @@ public class ColorPickerDialog extends Dialog {
         mOkButton = new Button(ctx);
         mOkButton.setText("Ok");
         mOkButton.setOnClickListener(new View.OnClickListener() {
-			
+        	
 			@Override
 			public void onClick(View v) {
-				invokeOnColorChanged(getColor());				
+				invokeOnColorChanged(getColor());
+				cpd.dismiss();
 			}
 		});
 
@@ -142,9 +149,10 @@ public class ColorPickerDialog extends Dialog {
         horizontalLayout.addView(cl);
         horizontalLayout.addView(al);
         horizontalLayout.addView(cr);
+        horizontalLayout2.addView(mColorButton);
+        horizontalLayout2.addView(mOkButton);
         verticalLayout.addView(horizontalLayout);
-        verticalLayout.addView(mColorButton);
-        verticalLayout.addView(mOkButton);
+        verticalLayout.addView(horizontalLayout2);
         setContentView(verticalLayout);
         setTitle("Pick a Color");
     }

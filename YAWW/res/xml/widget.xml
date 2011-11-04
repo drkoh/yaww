@@ -6,7 +6,7 @@
     android:minHeight="72dip"
     android:initialLayout="@layout/widget_layout"
     android:updatePeriodMillis="14400000"
-    android:configure="de.garbereder.YAWWActivity"
+    android:configure="de.garbereder.YAWWPrefActivity"
 />
 <!-- 
     android:updatePeriodMillis="14400000" -->

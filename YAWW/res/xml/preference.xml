@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <EditTextPreference android:title="@string/city" android:key="city" android:summary="@string/cityDescription"></EditTextPreference>
+	<ListPreference
+	    android:title="@string/countryCode"
+	    android:summary="@string/countryCodeDescription"
+	    android:key="countryCode"
+	    android:defaultValue="digiGreen" />
+	<Preference
+	   android:title="@string/bgColor"
+	   android:summary="@string/bgColorDescription"
+	   android:key="bgColor" />
+</PreferenceScreen>
