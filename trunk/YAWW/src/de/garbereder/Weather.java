@@ -50,6 +50,7 @@ public class Weather {
 	public void updateWeather() throws ClientProtocolException, IOException, ParserConfigurationException, IllegalStateException, SAXException, ExceptionWithId
 	{
 		String url = "http://www.google.com/ig/api?weather=" + URLEncoder.encode(city) + "&hl=" + locale;
+		System.out.println(url);
 		HttpClient hc = new DefaultHttpClient();
 		HttpResponse rp = hc.execute(new HttpPost(url));
 		if(rp.getStatusLine().getStatusCode() == HttpStatus.SC_OK)

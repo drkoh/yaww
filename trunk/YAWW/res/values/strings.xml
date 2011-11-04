@@ -7,4 +7,10 @@
     <string name="noMatch">Error during transfer.</string>
     <string name="errorCity">Error! Your city was not found.</string>
     <string name="lastUpdate">Last update:</string>
+    <string name="city">City</string>
+    <string name="cityDescription">Enter your City name here</string>
+    <string name="countryCode">Country code</string>
+    <string name="countryCodeDescription">Select your country code here</string>
+    <string name="bgColorDescription">Set the backgroundcolor here</string>
+    <string name="bgColor">Backgroundcolor</string>
 </resources>

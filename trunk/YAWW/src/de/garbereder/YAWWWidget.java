@@ -8,6 +8,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.http.client.ClientProtocolException;
 import org.xml.sax.SAXException;
 
+import de.garbereder.ColorPicker.ColorPickerDialog;
+
 import android.app.Service;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
@@ -36,9 +38,18 @@ public class YAWWWidget extends AppWidgetProvider {
             // To prevent any ANR timeouts, we perform the update in a service
             context.startService(new Intent(context, UpdateService.class));
     }
-    
-    public static class UpdateService extends Service {
+	
+	@Override
+	public void onReceive(Context context, Intent intent) {
+	    if ("PreferencesUpdated".equals(intent.getAction())) {	        
+            ComponentName thisWidget = new ComponentName(context, YAWWWidget.class);
+            AppWidgetManager manager = AppWidgetManager.getInstance(context);
+            manager.updateAppWidget(thisWidget, buildUpdate(context));	        
+	    }   
+	}
 
+	public class UpdateService extends Service {
+    	
         @Override
         public void onStart(Intent intent, int startId) {
             // Build the widget update for today
@@ -50,51 +61,49 @@ public class YAWWWidget extends AppWidgetProvider {
             manager.updateAppWidget(thisWidget, updateViews);
         }
 
-		private RemoteViews buildUpdate(Context context) {
-			
-			SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-			
-			RemoteViews updateViews = null;
-			updateViews = new RemoteViews(context.getPackageName(), R.layout.widget_layout);
-			try {
-				Weather w = new Weather(preferences.getString("city", ""),preferences.getString("locale", "de"));
-				int color = preferences.getInt("bgColor", 0xFF000000);
-				int iconSet = preferences.getInt("iconSet", 0);
-				
-				
-				refreshWidget(updateViews,w,color,ICONSETS.values()[iconSet],context);
-				
-			} catch (ClientProtocolException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IllegalStateException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (ParserConfigurationException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (SAXException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (ExceptionWithId e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
-			return updateViews;
-		}
-
 		@Override
 		public IBinder onBind(Intent arg0) {
 			return null;
 		}
+    }		
 
-    }
-
-	public static void refreshWidget(RemoteViews updateViews, Weather w, int color, ICONSETS pIconSet, Context context) {
+	RemoteViews buildUpdate(Context context) {
+		
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+		
+		RemoteViews updateViews = null;
+		updateViews = new RemoteViews(context.getPackageName(), R.layout.widget_layout);
+		try {
+			Weather w = new Weather(preferences.getString("city", ""),preferences.getString("countryCode", "de"));
+			int color = preferences.getInt("bgColor", 0xFF000000);
+			int iconSet = preferences.getInt("iconSet", 0);
+			
+			refreshWidget(updateViews,w,color,ICONSETS.values()[iconSet],context);
+			
+		} catch (ClientProtocolException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalStateException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ParserConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SAXException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExceptionWithId e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return updateViews;
+	}
+    
+    private void refreshWidget(RemoteViews updateViews, Weather w, int color, ICONSETS pIconSet, Context context) {
 		Resources res = context.getResources();
 		
 		updateViews.setInt(R.id.widget, "setBackgroundColor", color);
