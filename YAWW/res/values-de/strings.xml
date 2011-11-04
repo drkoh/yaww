@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="lLocation">Geben Sie den gewünschten Ort hier ein:</string>
-    <string name="bSave">Speichern</string>
-    <string name="noMatch">Fehler bei der Übertragung</string>
+    <string name="app_name">YAWW</string>
+    <string name="noMatch">Es ist ein Fehler aufgetreten.</string>
     <string name="errorCity">Fehler! Die eingegebene Stadt wurde nicht gefunden.</string>
-    <string name="lastUpdate">Letztes Update:</string>
+    <string name="lastUpdate">Letztes update:</string>
+    <string name="city">Stadt</string>
+    <string name="cityDescription">Geben Sie hier Ihre Stadt an</string>
+    <string name="countryCode">Land</string>
+    <string name="countryCodeDescription">Geben Sie hier Ihr Land zur korrekten Darstellung der Temperaturinheiten an.</string>
+    <string name="bgColorDescription">Setzen Sie hier die Hintergrundfarbe des Widgets</string>
+    <string name="bgColor">Hintergrundfarbe</string>
 </resources>
