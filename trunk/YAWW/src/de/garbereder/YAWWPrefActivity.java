@@ -1,13 +1,20 @@
 package de.garbereder;
 
+import java.io.IOException;
 import java.util.Locale;
 
 import yuku.ambilwarna.AmbilWarnaDialog;
 import android.app.Activity;
 import android.appwidget.AppWidgetManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
+import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceManager;
@@ -25,6 +32,25 @@ public class YAWWPrefActivity extends PreferenceActivity {
 		activity = this;
 		addPreferencesFromResource(R.xml.preference);
 		
+		// LOCATION STUFF
+		LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+		Geocoder geocoder = new Geocoder(this);
+		Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+		String city = "";
+		if( location != null )
+		{
+	        try {
+	                Address address = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1).get(0);
+	                city = address.getLocality();
+	        } catch (IOException e) {
+	                e.printStackTrace();
+	        }
+		}
+		EditTextPreference cityPref = (EditTextPreference) findPreference("city");
+		cityPref.setText(city);
+
+		
+		// COUNTRY CODE STUUF
 		ListPreference countryCode = (ListPreference) findPreference("countryCode");
 		Locale[] locales = Locale.getAvailableLocales();
 		CharSequence[] strLocales = new String[locales.length];
@@ -38,6 +64,7 @@ public class YAWWPrefActivity extends PreferenceActivity {
 		countryCode.setEntries(strLocales);
 		countryCode.setEntryValues(strLocalesValues);
 		
+		// COLOR PICKING
 		((Preference) findPreference("bgColor")).setOnPreferenceClickListener(new OnPreferenceClickListener() {
 			public boolean onPreferenceClick(Preference preference) {
 				AmbilWarnaDialog dialog = new AmbilWarnaDialog(
