@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="iconSet">
+        <item>colorfull</item>
+        <item>flatwhite</item>
+        <item>flatblack</item>
+    </string-array>
+    
+</resources>

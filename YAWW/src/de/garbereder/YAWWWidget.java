@@ -8,8 +8,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.http.client.ClientProtocolException;
 import org.xml.sax.SAXException;
 
-import de.garbereder.ColorPicker.ColorPickerDialog;
-
 import android.app.Service;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
@@ -23,14 +21,6 @@ import android.preference.PreferenceManager;
 import android.widget.RemoteViews;
 
 public class YAWWWidget extends AppWidgetProvider {
-	
-    public final static String[] iconSets = new String[]{ "colorfull","flatwhite","flatblack" };
-    public static enum ICONSETS
-    {
-    	COLORFULL,
-    	FLATWHITE,
-    	FLATBLACK2
-    }
 	
 	@Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager,
@@ -74,11 +64,11 @@ public class YAWWWidget extends AppWidgetProvider {
 		RemoteViews updateViews = null;
 		updateViews = new RemoteViews(context.getPackageName(), R.layout.widget_layout);
 		try {
-			Weather w = new Weather(preferences.getString("city", ""),preferences.getString("countryCode", "de"));
+			Weather w = new Weather(preferences.getString("city", ""),preferences.getString("countryCode", "de_DE").split("_")[0]);
 			int color = preferences.getInt("bgColor", 0xFF000000);
-			int iconSet = preferences.getInt("iconSet", 0);
+			String iconSet = preferences.getString("iconSet", "colorfull");
 			
-			refreshWidget(updateViews,w,color,ICONSETS.values()[iconSet],context);
+			refreshWidget(updateViews,w,color,iconSet,context);
 			
 		} catch (ClientProtocolException e) {
 			// TODO Auto-generated catch block
@@ -103,11 +93,10 @@ public class YAWWWidget extends AppWidgetProvider {
 		return updateViews;
 	}
     
-    private void refreshWidget(RemoteViews updateViews, Weather w, int color, ICONSETS pIconSet, Context context) {
+    private void refreshWidget(RemoteViews updateViews, Weather w, int color, String iconSet, Context context) {
 		Resources res = context.getResources();
 		
 		updateViews.setInt(R.id.widget, "setBackgroundColor", color);
-		String iconSet = iconSets[pIconSet.ordinal()];
 		
 		// CURRENT
 		updateViews.setTextViewText( R.id.widget_day0,w.getCurrentCondition().getTemp() + "°");

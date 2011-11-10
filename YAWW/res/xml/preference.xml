@@ -6,9 +6,16 @@
 	    android:title="@string/countryCode"
 	    android:summary="@string/countryCodeDescription"
 	    android:key="countryCode"
-	    android:defaultValue="digiGreen" />
+	    android:defaultValue="de_DE" />
 	<Preference
 	   android:title="@string/bgColor"
 	   android:summary="@string/bgColorDescription"
 	   android:key="bgColor" />
+	<ListPreference
+		android:title="@string/iconSet"
+		android:summary="@string/iconSetDescription"
+		android:key="iconSet"
+		android:entries="@array/iconSet"
+		android:entryValues="@array/iconSet"
+		android:defaultValue="colorfull" />
 </PreferenceScreen>

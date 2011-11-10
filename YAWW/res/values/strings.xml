@@ -10,4 +10,6 @@
     <string name="countryCodeDescription">Select your country code here</string>
     <string name="bgColorDescription">Set the backgroundcolor here</string>
     <string name="bgColor">Backgroundcolor</string>
+    <string name="iconSet">Iconset</string>
+    <string name="iconSetDescription">Choose the iconset here.</string>
 </resources>
