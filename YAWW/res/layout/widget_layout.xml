@@ -41,7 +41,8 @@
 				</LinearLayout>
 			</LinearLayout>
 			<!-- UPDATE TIME -->
-			<TextView android:text="Not updated" android:layout_height="match_parent" android:id="@+id/updateTime" android:textAppearance="@android:attr/textAppearanceSmall" android:layout_width="fill_parent" android:layout_gravity="right" android:gravity="right|bottom"></TextView>
+			<!--  android:textAppearance="@android:attr/textAppearanceSmall" -->
+			<TextView android:text="Not updated" android:layout_height="match_parent" android:id="@+id/updateTime"  android:layout_width="fill_parent" android:layout_gravity="right" android:gravity="right|bottom"></TextView>
 		</LinearLayout>
 	</LinearLayout>
 </LinearLayout>
