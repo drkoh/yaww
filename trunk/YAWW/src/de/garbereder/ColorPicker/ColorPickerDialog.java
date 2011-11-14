@@ -98,7 +98,7 @@ public class ColorPickerDialog extends Dialog {
 			@Override
 			public void onClick(View v) {
 				invokeOnColorChanged(getColor());
-				cpd.dismiss();
+				
 			}
 		});
 

@@ -149,7 +149,6 @@ public class ColorLine extends View {
 
     public void setColor(int color) {
 		mColor = color;
-		cursorPos = colorToNormalizedPosition(color);
 		invokeOnColorChanged(color);
 		invalidate();
 	}
