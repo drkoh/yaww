@@ -3,7 +3,7 @@ package de.garbereder;
 import java.io.IOException;
 import java.util.Locale;
 
-import yuku.ambilwarna.AmbilWarnaDialog;
+//import yuku.ambilwarna.AmbilWarnaDialog;
 import android.app.Activity;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
@@ -67,6 +67,7 @@ public class YAWWPrefActivity extends PreferenceActivity {
 		// COLOR PICKING
 		((Preference) findPreference("bgColor")).setOnPreferenceClickListener(new OnPreferenceClickListener() {
 			public boolean onPreferenceClick(Preference preference) {
+				/*
 				AmbilWarnaDialog dialog = new AmbilWarnaDialog(
 						activity,
 						((Preference) findPreference("bgColor")).getSharedPreferences().getInt("bgColor", 0xFF000000),
@@ -88,6 +89,7 @@ public class YAWWPrefActivity extends PreferenceActivity {
 						}
 				);
 				dialog.show();
+				*/
 				return true;
 			}
 		});
